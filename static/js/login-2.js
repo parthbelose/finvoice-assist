@@ -29,32 +29,6 @@ function startVideo()
   video.addEventListener('play', setupSpeechRecognition);
 }
 
-// After video is playing, we start face-api and speech recognition
-video.addEventListener('play', () => {
-  setupFaceDetection();
-  setupSpeechRecognition();
-});
-
-// Function to handle face detection and display results on the video
-function setupFaceDetection() {
-const canvas = faceapi.createCanvasFromMedia(video);
-document.body.append(canvas);
-const displaySize = { width: video.width, height: video.height };
-faceapi.matchDimensions(canvas, displaySize);
-
-setInterval(async () => {
-  const detections = await faceapi
-    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-    .withFaceLandmarks();
-
-  const resizedDetections = faceapi.resizeResults(detections, displaySize);
-  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-  faceapi.draw.drawDetections(canvas, resizedDetections);
-  faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-}, 100);
-}
-
 // Function to handle voice commands
 function setupSpeechRecognition() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -79,6 +53,7 @@ function setupSpeechRecognition() {
   recognition.start();
 }
 
+// Capture face embedding function
 // Capture face embedding function
 async function captureEmbedding() {
   const detections = await faceapi
@@ -105,14 +80,14 @@ async function verifyUser(embedding) {
   const userName = document.getElementById('user_name').value.trim();
   const password = document.getElementById('password').value.trim();
 
-  if (!userName ) {
+  if (!userName) {
     alert("Please enter both username and password.");
     return;
   }
 
   const payload = {
     user_name: userName,
-    password: password,
+    // password: password,
     embedding: embedding,
   };
 
@@ -127,13 +102,10 @@ async function verifyUser(embedding) {
 
     const data = await response.json();
     if (data.success) {
-      console.log(data.message);
+      console.log(data);
       document.getElementById('resultMessage').innerText = `Login successful for user: ${data.user_name}`;
-      // Only store the user ID if it has not been stored before
-      if (!localStorage.getItem('user_id')) {
-        localStorage.setItem('user_id', data.user_id);
-      }
-      window.location.href ="http://127.0.0.1:5000/home";
+      const userId = localStorage.setItem('user_id',data._id);
+      window.location.href="http://127.0.0.1:5000/home"
     } else {
       console.log(data.message);
       document.getElementById('resultMessage').innerText = `Error: ${data.message}`;
@@ -143,64 +115,24 @@ async function verifyUser(embedding) {
     document.getElementById('resultMessage').innerText = `Error during verification.`;
   }
 }
-async function verifyUserPassword() {
-  const userName = document.getElementById('user_name').value.trim();
-  const password = document.getElementById('password').value.trim();
 
-  if (!userName || !password) {
-    alert("Please enter both username and password.");
-    return;
-  }
+// Display face detection results on the video
+video.addEventListener('play', () => {
+  const canvas = faceapi.createCanvasFromMedia(video);
+  document.body.append(canvas);
+  const displaySize = { width: video.width, height: video.height };
+  faceapi.matchDimensions(canvas, displaySize);
 
-  const payload = {
-    user_name: userName,
-    password: password,
-  };
+  setInterval(async () => {
+    const detections = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks();
 
-  try {
-    const response = await fetch('http://127.0.0.1:5000/verify_password', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload),
-    });
+    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 
-    const data = await response.json();
-    if (data.success) {
-      console.log(data.message);
-      document.getElementById('resultMessage').innerText = `Login successful for user: ${data.user_name}`;
-      // Only store the user ID if it has not been stored before
-      if (!localStorage.getItem('user_id')) {
-        localStorage.setItem('user_id', data.user_id);
-      }
-      window.location.href ="http://127.0.0.1:5000/home";
-    } else {
-      console.log(data.message);
-      document.getElementById('resultMessage').innerText = `Error: ${data.message}`;
-    }
-  } catch (error) {
-    console.error('Error during verification:', error);
-    document.getElementById('resultMessage').innerText = `Error during verification.`;
-  }
-}
-// // Display face detection results on the video
-// video.addEventListener('play', () => {
-//   const canvas = faceapi.createCanvasFromMedia(video);
-//   document.body.append(canvas);
-//   const displaySize = { width: video.width, height: video.height };
-//   faceapi.matchDimensions(canvas, displaySize);
-
-//   setInterval(async () => {
-//     const detections = await faceapi
-//       .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-//       .withFaceLandmarks();
-
-//     const resizedDetections = faceapi.resizeResults(detections, displaySize);
-//     canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-//     faceapi.draw.drawDetections(canvas, resizedDetections);
-//     faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-//   }, 100);
-// });
+    faceapi.draw.drawDetections(canvas, resizedDetections);
+    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+  }, 100);
+});
 

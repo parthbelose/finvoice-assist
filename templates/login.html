@@ -1,14 +1,13 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Face Recognition Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
-  <script defer src="{{ url_for('static', filename='js/login-2.js') }}"></script> <!-- Link to the external JS file -->
-
+  <script defer src="{{ url_for('static', filename='js/login-2.js') }}"></script> 
   <style>
-    /* body {
+    body {
       margin: 0;
       padding: 0;
       width: 100vw;
@@ -18,54 +17,21 @@
       align-items: center;
       flex-direction: column;
       background-color: #f4f4f9;
-      font-family: Arial, sans-serif;
-      overflow: hidden;
-      text-align: center;
-    } */
+    }
     
-    /* h1 {
-      text-align: center;
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      color: #4CAF50;
-      z-index: 1;
-    }
-
-    #videoContainer {
-      position: relative;
-      width: 560px;
-      height: 320px;
-      margin-bottom: 30px;
-      z-index: 0;
-    }
-
-    #video {
-      width: 100%;
-      height: 100%;
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 640px;
+      height: 480px;
       border: 2px solid #333;
-      background-color: black;
-      border-radius: 8px;
-    }
-
-    #fields {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 400px;
-      margin-top: 20px;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 1;
     }
 
     input {
-      margin: 10px 0;
+      margin: 10px;
       padding: 10px;
       font-size: 16px;
-      width: 100%;
       border: 1px solid #ccc;
       border-radius: 4px;
     }
@@ -74,12 +40,10 @@
       margin-top: 10px;
       padding: 10px 20px;
       font-size: 16px;
-      width: 100%;
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
-      border-radius: 4px;
     }
 
     button:hover {
@@ -90,103 +54,43 @@
       font-size: 20px;
       margin-top: 20px;
       text-align: center;
-      color: #333;
-    } */
-
-    body {
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      background-color: #f4f4f9;
-      font-family: Arial, sans-serif;
-      height: 100%;
-      overflow: hidden;
-      text-align: center;
     }
-
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-      color: #4CAF50;
-      z-index: 1;
-      padding-top: 20px; 
-    }
-
-    #videoContainer {
-      position: relative;
-      width: 100%;
-      max-width: 640px;
-      height: auto;
-      margin-bottom: 30px;
-      z-index: 0;
-    }
-
-    #video {
-      width: 100%;
-      height: 100%;
-      border: 2px solid #333;
-      background-color: black;
-      border-radius: 8px;
-    }
-
-    #fields {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-      max-width: 400px;
-      margin-top: 20px;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 1;
-    }
-
-    input {
-      margin: 10px 0;
-      padding: 10px;
-      font-size: 16px;
-      width: 100%;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      width: 100%;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    #resultMessage {
-      font-size: 20px;
-      margin-top: 20px;
-      text-align: center;
-      color: #333;
-    }
-    
   </style>
 </head>
 <body>
 
   <h1>Face Recognition Login</h1>
 
+  <div>
+    <input type="text" id="user_name" placeholder="Enter Username" />
+    <input type="password" id="password" placeholder="Enter Password" />
+  </div>
+
+  <video id="video" width="640" height="480" autoplay></video>
+
+  <div id="resultMessage"></div>
+
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Recognition Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+  <script defer src="{{ url_for('static', filename='js/login-2.js') }}"></script> <!-- Link to the external JS file -->
+  <style>
+    /* Styling here */
+  </style>
+</head>
+<body>
+  <h1>Face Recognition Login</h1>
+
   <!-- Video Stream Container -->
   <div id="videoContainer">
-    <video id="video" autoplay muted></video>
+    <video id="video" autoplay></video>
   </div>
 
   <!-- Form for user credentials -->
@@ -199,5 +103,188 @@
   <!-- Result Message -->
   <div id="resultMessage"></div>
 
+  <script>
+    const video = document.getElementById('video');
+
+    // Load face-api models when the page loads
+    Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
+      faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
+      faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
+    ]).then(startVideo).catch((err) => {
+      console.error("Error loading models:", err);
+    });
+
+    // Start webcam video stream immediately
+    function startVideo() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then((stream) => {
+            video.srcObject = stream;
+          })
+          .catch((err) => {
+            console.error("Error accessing the webcam:", err);
+            alert("Unable to access the webcam. Please make sure the camera is connected and permissions are granted.");
+          });
+      } else {
+        alert("Your browser does not support webcam access.");
+      }
+
+      // After video is playing, we start speech recognition
+      video.addEventListener('play', setupSpeechRecognition);
+    }
+
+    // Function to handle voice commands
+    function setupSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Speech recognition is not supported in this browser.");
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+
+      recognition.addEventListener('result', async (event) => {
+        const command = event.results[0][0].transcript.trim().toUpperCase();
+        if (command === "CAPTURE") {
+          console.log("CAPTURE command received. Starting face recognition...");
+          await captureEmbedding();  // Start face recognition when "CAPTURE" is said
+        }
+      });
+
+      recognition.addEventListener('end', () => recognition.start()); // Keep recognition active
+      recognition.start();
+    }
+
+    // Capture face embedding function
+    async function captureEmbedding() {
+      const detections = await faceapi
+        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      if (detections.length > 0) {
+        const embedding = Array.from(detections[0].descriptor); // Take first detected face
+        console.log("Embedding captured:", embedding);
+        
+        // Send captured embedding to the backend for verification
+        await verifyUser(embedding);
+
+        document.getElementById('resultMessage').innerText = "Face captured successfully!";
+      } else {
+        console.log("No face detected. Please try again.");
+        document.getElementById('resultMessage').innerText = "No face detected. Please try again.";
+      }
+    }
+
+    // Function to verify user using backend
+    async function verifyUser(embedding) {
+      const userName = document.getElementById('user_name').value.trim();
+      // const password = document.getElementById('password').value.trim();
+
+      if (!userName ) {
+        alert("Please enter both username and password.");
+        return;
+      }
+
+      const payload = {
+        user_name: userName,
+        // password: password,
+        embedding: embedding,
+      };
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/verify_face', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          console.log(data.message);
+          document.getElementById('resultMessage').innerText = `Login successful for user: ${data.user_name}`;
+          // Only store the user ID if it has not been stored before
+          localStorage.removeItem('user_id');
+          localStorage.removeItem('user_name');
+            localStorage.setItem('user_id', data._id);
+            localStorage.setItem('user_name', data.user_name);
+          window.location.href = "http://127.0.0.1:5000/home";
+        } else {
+          console.log(data.message);
+          document.getElementById('resultMessage').innerText = `Error: ${data.message}`;
+        }
+      } catch (error) {
+        console.error('Error during verification:', error);
+        document.getElementById('resultMessage').innerText = `Error during verification.`;
+      }
+    }
+
+    async function verifyUserPassword() {
+      const userName = document.getElementById('user_name').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      if (!userName || !password) {
+        alert("Please enter both username and password.");
+        return;
+      }
+
+      const payload = {
+        user_name: userName,
+        password: password,
+      };
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/verify_password', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+        console.log(data)
+        if (data.success) {
+          console.log(data.message);
+          document.getElementById('resultMessage').innerText = `Login successful for user: ${data.user_name}`;
+          // Only store the user ID if it has not been stored before
+            localStorage.setItem('user_id', data._id);
+            localStorage.setItem('user_name', data.user_name);
+          window.location.href = "http://127.0.0.1:5000/home";
+        } else {
+          console.log(data.message);
+          document.getElementById('resultMessage').innerText = `Error: ${data.message}`;
+        }
+      } catch (error) {
+        console.error('Error during verification:', error);
+        document.getElementById('resultMessage').innerText = `Error during verification.`;
+      }
+    }
+
+    // Display face detection results on the video
+    // video.addEventListener('play', () => {
+    //   const canvas = faceapi.createCanvasFromMedia(video);
+    //   document.body.append(canvas);
+    //   const displaySize = { width: video.width, height: video.height };
+    //   faceapi.matchDimensions(canvas, displaySize);
+
+    //   setInterval(async () => {
+    //     const detections = await faceapi
+    //       .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+    //       .withFaceLandmarks();
+
+        // const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+        // faceapi.draw.drawDetections(canvas, resizedDetections);
+        // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      // }, 100);
+    // });
+  </script>
 </body>
 </html>
