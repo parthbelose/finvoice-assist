@@ -1,117 +1,37 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Voice-to-Response Generator</title>
-  <style>
-    /* Global Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f7f9fc;
-      color: #333;
-      padding: 0 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
-    }
-    h2 {
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 20px;
-      color: #4a90e2;
-    }
-    .container {
-      width: 100%;
-      max-width: 600px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      text-align: center;
-    }
-    button {
-      background-color: #4a90e2;
-      color: #fff;
-      padding: 12px 25px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    button:hover {
-      background-color: #357ab7;
-    }
-    p {
-      margin-top: 20px;
-      font-size: 18px;
-      color: #555;
-    }
-    .transcript, .response {
-      font-weight: 500;
-      color: #333;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    .user-info {
-      background-color: #f0f4f8;
-      padding: 15px;
-      border-radius: 6px;
-      margin-top: 20px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      text-align: left;
-      width: 100%;
-    }
-    .user-info strong {
-      display: block;
-      font-size: 18px;
-      margin-bottom: 8px;
-      color: #4a90e2;
-    }
-    .user-info p {
-      font-size: 14px;
-      color: #333;
-    }
-    .spinner {
-      display: none;
-      margin-top: 20px;
-      border: 4px solid rgba(0, 0, 0, 0.1);
-      border-top: 4px solid #4a90e2;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-  <div class="container">
-    <h2>Voice-to-Response Generator</h2>
-    <button id="toggleMicrophoneBtn">Start Microphone</button>
-    <div class="spinner" id="loadingSpinner"></div>
-    <p id="transcriptDisplay" class="transcript">Your Input: Say something to get started...</p>
-    <div class="user-info" id="userInfo">
-      <strong>User Information:</strong>
-      <p id="userId">Loading...</p>
-      <p id="userName">Loading...</p>
+  <div class="bg-gradient-to-b from-[#101212] to-[#08201D] min-h-screen flex flex-col items-center pt-20">
+    <main class="relative z-10 flex flex-col items-center">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold text-white sm:text-6xl">Voice-to-Response Generator</h1>
+        <p class="mt-4 text-lg text-white">Speak, and we'll respond intelligently.</p>
+      </div>
+      <div class="mt-8 flex flex-col items-center">
+        <button id="toggleMicrophoneBtn" class="px-6 py-4 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:bg-blue-700">
+          Start Microphone
+        </button>
+        <div id="loadingSpinner" class="mt-4 hidden">
+          <div class="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+      <p id="transcriptDisplay" class="mt-6 text-white text-lg text-center">Your Input: Say something to get started...</p>
+      <p id="responseDisplay" class="mt-4 text-green-400 text-lg text-center"></p>
+    </main>
+
+    <div class="mt-16 w-full">
+      <img class="hidden w-full lg:block" src="https://cdn.rareblocks.xyz/collection/celebration/images/hero/5/credit-cards.png" alt="Credit Cards" />
+      <img class="block w-full lg:hidden" src="https://cdn.rareblocks.xyz/collection/celebration/images/hero/5/credit-cards-mobile.png" alt="Credit Cards Mobile" />
     </div>
-    <p id="responseDisplay" class="response"></p>
   </div>
 
-  <!-- <script>
+  <script>
 
     // Check if user is logged in by checking localStorage for user_id
     const userId = localStorage.getItem('user_id');
@@ -130,7 +50,7 @@
     const userIdElement = document.getElementById('userId');
     const userNameElement = document.getElementById('userName');
 
-    let isListening = false;
+    let isListening = true;
     let transcript = '';
 
     // Fake user data for demonstration
@@ -150,7 +70,7 @@
     // Speech Recognition setup
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.continuous = false;
+    recognition.continuous = true;
 
     recognition.onstart = () => {
       isListening = true;
@@ -222,113 +142,448 @@
       window.location.href = 'http://127.0.0.1:5000/login'; // Redirect to login page
     };
 
-  </script> -->
+  </script>
+</body>
+</html> -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voice-to-Response Generator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div class="bg-gradient-to-b from-[#101212] to-[#08201D] min-h-screen flex flex-col items-center pt-20">
+    <main class="relative z-10 flex flex-col items-center">
+      <div class="text-center">
+        <h1 class="text-4xl font-bold text-white sm:text-6xl">Voice-to-Response Generator</h1>
+        <p class="mt-4 text-lg text-white">Speak, and we'll respond intelligently.</p>
+      </div>
+      <div class="mt-8 flex flex-col items-center">
+        <button id="toggleMicrophoneBtn" class="px-6 py-4 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:bg-blue-700">
+          Start Microphone
+        </button>
+        <div id="loadingSpinner" class="mt-4 hidden">
+          <div class="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+      <p id="transcriptDisplay" class="mt-6 text-white text-lg text-center">Your Input: Say something to get started...</p>
+      <p id="responseDisplay" class="mt-4 text-green-400 text-lg text-center"></p>
+      <div id="errorDisplay" class="mt-4 text-red-400 text-lg text-center"></div>
+    </main>
+  </div>
+  <div class="mt-16 w-full">
+    <img class="hidden w-full lg:block" src="https://cdn.rareblocks.xyz/collection/celebration/images/hero/5/credit-cards.png" alt="Credit Cards" />
+    <img class="block w-full lg:hidden" src="https://cdn.rareblocks.xyz/collection/celebration/images/hero/5/credit-cards-mobile.png" alt="Credit Cards Mobile" />
+  </div>
   <script>
-    // Key binding setup
-    document.addEventListener('keydown', (event) => {
-      if (event.code === 'Space') {
-        event.preventDefault(); // Prevent default spacebar behavior like scrolling
-        toggleMicrophone();
-      }
-    });
-  
-    // Check if user is logged in by checking localStorage for user_id
-    const userId = localStorage.getItem('user_id');
-    const username = localStorage.getItem('user_name');
-  
-    if (!userId) {
-      // Redirect to login page if no user_id is found
-      window.location.href = '/login'; // Adjust the URL to your login page
+    // Check if browser supports speech recognition
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      document.getElementById('errorDisplay').textContent = 'Speech recognition is not supported in this browser. Please use Chrome or Edge.';
+      document.getElementById('toggleMicrophoneBtn').disabled = true;
     }
-  
+
     const toggleMicrophoneBtn = document.getElementById('toggleMicrophoneBtn');
     const transcriptDisplay = document.getElementById('transcriptDisplay');
     const responseDisplay = document.getElementById('responseDisplay');
     const loadingSpinner = document.getElementById('loadingSpinner');
-    const userInfo = document.getElementById('userInfo');
-    const userIdElement = document.getElementById('userId');
-    const userNameElement = document.getElementById('userName');
-  
+    const errorDisplay = document.getElementById('errorDisplay');
+
     let isListening = false;
-    let transcript = '';
-  
-    // Populate user info from local storage
-    userIdElement.textContent = `User ID: ${localStorage.getItem('user_id')}`;
-    userNameElement.textContent = `User Name: ${localStorage.getItem('user_name')}`;
-  
-    // Speech Recognition setup
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-  
-    recognition.onstart = () => {
-      isListening = true;
-      toggleMicrophoneBtn.textContent = "Stop Microphone";
-      transcriptDisplay.textContent = "Listening...";
-    };
-  
-    recognition.onend = () => {
-      isListening = false;
-      toggleMicrophoneBtn.textContent = "Start Microphone";
-    };
-  
-    recognition.onresult = (event) => {
-      transcript = event.results[0][0].transcript;
-      transcriptDisplay.textContent = `Your Input: ${transcript}`;
-  
-      // Check if the user said "logout"
-      if (transcript.toLowerCase().includes('logout')) {
-        logOut();
+    let recognition = null;
+
+    function initializeSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      
+      // Configure recognition settings
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        toggleMicrophoneBtn.textContent = "Stop Microphone";
+        transcriptDisplay.textContent = "Listening...";
+        errorDisplay.textContent = "";
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        toggleMicrophoneBtn.textContent = "Start Microphone";
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        transcriptDisplay.textContent = `Your Input: ${transcript}`;
+        
+        if (transcript.toLowerCase().includes('logout')) {
+          logOut();
+        } else {
+          generateResponse(transcript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        errorDisplay.textContent = `Error: ${event.error}. Please try again.`;
+        isListening = false;
+        toggleMicrophoneBtn.textContent = "Start Microphone";
+      };
+    }
+
+    const toggleMicrophone = async () => {
+      try {
+        // Initialize recognition if it hasn't been already
+        if (!recognition) {
+          initializeSpeechRecognition();
+        }
+
+        if (isListening) {
+          recognition.stop();
+        } else {
+          await navigator.mediaDevices.getUserMedia({ audio: true });
+          recognition.start();
+        }
+      } catch (error) {
+        console.error('Microphone access error:', error);
+        errorDisplay.textContent = 'Error accessing microphone. Please ensure microphone permissions are granted.';
       }
-      generateResponse();
     };
-  
-    const toggleMicrophone = () => {
-      if (isListening) {
-        recognition.stop();
-      } else {
-        recognition.start();
-      }
-    };
-  
-    toggleMicrophoneBtn.addEventListener('click', toggleMicrophone);
-  
-    // Function to generate a response from the backend
-    const generateResponse = async () => {
+
+    const generateResponse = async (transcript) => {
       loadingSpinner.style.display = 'block';
       try {
-        const res = await fetch('{{ url_for("chat") }}', {
+        const userId = localStorage.getItem('user_id');
+        const username = localStorage.getItem('user_name');
+        
+        if (!userId || !username) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const res = await fetch('/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ message: `My name is ${username} and my user_id is ${userId}. ${transcript}` }),
+          body: JSON.stringify({ 
+            message: `My name is ${username} and my user_id is ${userId}. ${transcript}` 
+          }),
         });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
         const data = await res.json();
         responseDisplay.textContent = `Response: ${data.message}`;
         speakResponse(data.message);
       } catch (error) {
         console.error('Error generating response:', error);
         responseDisplay.textContent = 'Sorry, there was an error processing your request.';
-        speakResponse('Sorry, there was an error processing your request.');
+        errorDisplay.textContent = `Error: ${error.message}`;
+      } finally {
+        loadingSpinner.style.display = 'none';
       }
-      loadingSpinner.style.display = 'none';
     };
-  
-    // Function to speak the response
+
     const speakResponse = (text) => {
-      const speechSynthesis = window.speechSynthesis;
       const speech = new SpeechSynthesisUtterance(text);
-      speechSynthesis.speak(speech);
+      window.speechSynthesis.speak(speech);
     };
-  
+
     const logOut = () => {
-      localStorage.removeItem('user_id');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('userName');
-      window.location.href = 'http://127.0.0.1:5000/login'; // Redirect to login page
+      localStorage.clear();
+      window.location.href = '/login';
     };
+
+    toggleMicrophoneBtn.addEventListener('click', toggleMicrophone);
   </script>
-  
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Voice-to-Response Generator - An accessible tool for voice interactions">
+  <title>Voice-to-Response Generator - Accessible Interface</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div class="bg-gradient-to-b from-[#101212] to-[#08201D] min-h-screen flex flex-col items-center pt-20" role="main">
+    <main class="relative z-10 flex flex-col items-center max-w-3xl mx-auto px-4">
+      <!-- Skip to main content link -->
+      <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white p-4 rounded">
+        Skip to main content
+      </a>
+
+      <div class="text-center" role="banner">
+        <h1 id="page-title" class="text-4xl font-bold text-white sm:text-6xl" tabindex="0">Voice-to-Response Generator</h1>
+        <p id="page-description" class="mt-4 text-lg text-white" tabindex="0" aria-description="true">
+          Voice-activated response system. Press the button below to start or stop voice recording.
+        </p>
+      </div>
+
+      <div id="main-content" class="mt-8 flex flex-col items-center w-full" role="region" aria-labelledby="page-title">
+        <button 
+          id="toggleMicrophoneBtn" 
+          class="px-6 py-4 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:outline-none"
+          aria-label="Toggle microphone. Currently stopped."
+          aria-pressed="false"
+        >
+          Start Recording
+        </button>
+
+        <!-- Status region for screen readers -->
+        <div 
+          id="status-region" 
+          class="sr-only" 
+          role="status" 
+          aria-live="polite"
+        ></div>
+
+        <div 
+          id="loadingSpinner" 
+          class="mt-4 hidden" 
+          role="progressbar" 
+          aria-label="Processing your request"
+        >
+          <div class="w-6 h-6 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <div 
+          id="transcriptContainer" 
+          class="mt-6 w-full max-w-2xl p-4 border border-white/20 rounded-lg"
+          role="region" 
+          aria-label="Voice Recognition Results"
+        >
+          <p 
+            id="transcriptDisplay" 
+            class="text-white text-lg"
+            aria-live="polite"
+          >
+            Ready to start. Press the button above to begin recording.
+          </p>
+        </div>
+
+        <div 
+          id="responseContainer" 
+          class="mt-4 w-full max-w-2xl p-4 border border-green-400/20 rounded-lg"
+          role="region" 
+          aria-label="System Response"
+        >
+          <p 
+            id="responseDisplay" 
+            class="text-green-400 text-lg"
+            aria-live="polite"
+          ></p>
+        </div>
+
+        <div 
+          id="errorContainer"
+          class="mt-4 w-full max-w-2xl"
+          role="alert"
+          aria-atomic="true"
+        >
+          <p id="errorDisplay" class="text-red-400 text-lg"></p>
+        </div>
+
+        <!-- Keyboard shortcuts help -->
+        <div class="mt-8 text-white" role="region" aria-label="Keyboard shortcuts">
+          <h2 class="text-xl font-semibold mb-2">Keyboard Shortcuts:</h2>
+          <ul class="list-disc pl-5">
+            <li>Press Space or Enter to start/stop recording</li>
+            <li>Press Escape to cancel recording</li>
+            <li>Press R to replay last response</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      document.getElementById('errorDisplay').textContent = 'Speech recognition is not supported in this browser. Please use Chrome or Edge.';
+      document.getElementById('toggleMicrophoneBtn').disabled = true;
+      announceMessage('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+    }
+
+    const toggleMicrophoneBtn = document.getElementById('toggleMicrophoneBtn');
+    const transcriptDisplay = document.getElementById('transcriptDisplay');
+    const responseDisplay = document.getElementById('responseDisplay');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const errorDisplay = document.getElementById('errorDisplay');
+    const statusRegion = document.getElementById('status-region');
+
+    let isListening = false;
+    let recognition = null;
+    let lastResponse = '';
+
+    function announceMessage(message) {
+      statusRegion.textContent = message;
+    }
+
+    function initializeSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        isListening = true;
+        toggleMicrophoneBtn.textContent = "Stop Recording";
+        toggleMicrophoneBtn.setAttribute('aria-pressed', 'true');
+        toggleMicrophoneBtn.setAttribute('aria-label', 'Toggle microphone. Currently recording.');
+        announceMessage("Recording started. Speak now.");
+        transcriptDisplay.textContent = "Listening... Speak now.";
+      };
+
+      recognition.onend = () => {
+        isListening = false;
+        toggleMicrophoneBtn.textContent = "Start Recording";
+        toggleMicrophoneBtn.setAttribute('aria-pressed', 'false');
+        toggleMicrophoneBtn.setAttribute('aria-label', 'Toggle microphone. Currently stopped.');
+        announceMessage("Recording stopped.");
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        transcriptDisplay.textContent = transcript;
+        announceMessage(`Recognized text: ${transcript}`);
+        
+        if (transcript.toLowerCase().includes('logout')) {
+          logOut();
+        } else {
+          generateResponse(transcript);
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        const errorMessage = `Error: ${event.error}. Please try again.`;
+        errorDisplay.textContent = errorMessage;
+        announceMessage(errorMessage);
+        isListening = false;
+        toggleMicrophoneBtn.textContent = "Start Recording";
+        toggleMicrophoneBtn.setAttribute('aria-pressed', 'false');
+      };
+    }
+
+    const toggleMicrophone = async () => {
+      try {
+        if (!recognition) {
+          initializeSpeechRecognition();
+        }
+
+        if (isListening) {
+          recognition.stop();
+        } else {
+          await navigator.mediaDevices.getUserMedia({ audio: true });
+          recognition.start();
+        }
+      } catch (error) {
+        const errorMessage = 'Error accessing microphone. Please ensure microphone permissions are granted.';
+        console.error('Microphone access error:', error);
+        errorDisplay.textContent = errorMessage;
+        announceMessage(errorMessage);
+      }
+    };
+
+    const generateResponse = async (transcript) => {
+      loadingSpinner.style.display = 'block';
+      announceMessage("Processing your request...");
+      
+      try {
+        const userId = localStorage.getItem('user_id');
+        const username = localStorage.getItem('user_name');
+        
+        if (!userId || !username) {
+          announceMessage("Session expired. Redirecting to login page.");
+          window.location.href = '/login';
+          return;
+        }
+
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            message: `My name is ${username} and my user_id is ${userId}. ${transcript}` 
+          }),
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        lastResponse = data.message;
+        responseDisplay.textContent = lastResponse;
+        announceMessage("Response received.");
+        speakResponse(lastResponse);
+      } catch (error) {
+        const errorMessage = 'Sorry, there was an error processing your request.';
+        console.error('Error generating response:', error);
+        responseDisplay.textContent = errorMessage;
+        errorDisplay.textContent = `Error: ${error.message}`;
+        announceMessage(errorMessage);
+      } finally {
+        loadingSpinner.style.display = 'none';
+      }
+    };
+
+    const speakResponse = (text) => {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.rate = 1.0; // Normal speed
+      speech.pitch = 1.0; // Normal pitch
+      speech.volume = 1.0; // Full volume
+      window.speechSynthesis.speak(speech);
+    };
+
+    const replayLastResponse = () => {
+      if (lastResponse) {
+        speakResponse(lastResponse);
+        announceMessage("Replaying last response");
+      } else {
+        announceMessage("No response to replay");
+      }
+    };
+
+    const logOut = () => {
+      announceMessage("Logging out...");
+      localStorage.clear();
+      window.location.href = '/login';
+    };
+
+    // Event Listeners
+    toggleMicrophoneBtn.addEventListener('click', toggleMicrophone);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (event) => {
+      if (document.activeElement.tagName === 'INPUT') return; // Don't trigger if user is typing in an input
+
+      if (event.code === 'Space' || event.code === 'Enter') {
+        event.preventDefault();
+        toggleMicrophone();
+      } else if (event.code === 'Escape' && isListening) {
+        event.preventDefault();
+        recognition.stop();
+      } else if (event.code === 'KeyR') {
+        event.preventDefault();
+        replayLastResponse();
+      }
+    });
+
+    // Announce page load
+    window.addEventListener('load', () => {
+      announceMessage("Voice-to-Response Generator page loaded. Press Space or Enter to start recording.");
+    });
+  </script>
 </body>
 </html>

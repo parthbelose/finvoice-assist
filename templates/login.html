@@ -1,226 +1,267 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Face Recognition Login</title>
-  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
-  <script defer src="{{ url_for('static', filename='js/login-2.js') }}"></script> 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      background-color: #f4f4f9;
-    }
-    
-    video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 640px;
-      height: 480px;
-      border: 2px solid #333;
-    }
-
-    input {
-      margin: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    #resultMessage {
-      font-size: 20px;
-      margin-top: 20px;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>Face Recognition Login</h1>
-
-  <div>
-    <input type="text" id="user_name" placeholder="Enter Username" />
-    <input type="password" id="password" placeholder="Enter Password" />
-  </div>
-
-  <video id="video" width="640" height="480" autoplay></video>
-
-  <div id="resultMessage"></div>
-
-</body>
-</html> -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Face Recognition Login</title>
+  <meta name="description" content="Accessible face recognition login system with voice commands">
+  <title>Accessible Face Recognition Login</title>
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
-  <script defer src="{{ url_for('static', filename='js/login-2.js') }}"></script> <!-- Link to the external JS file -->
   <style>
-    /* Styling here */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    
+    .focus-visible {
+      outline: 3px solid #4CAF50;
+      outline-offset: 2px;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: 2px solid #333;
+      border-radius: 5px;
+      background: #4CAF50;
+      color: white;
+      font-size: 16px;
+    }
+    
+    button:focus {
+      outline: 3px solid #4CAF50;
+      outline-offset: 2px;
+    }
+    
+    input {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border: 2px solid #333;
+      border-radius: 5px;
+    }
+    
+    #videoContainer {
+      margin: 20px 0;
+    }
   </style>
 </head>
 <body>
-  <h1>Face Recognition Login</h1>
+  <a href="#main" class="sr-only focus:not-sr-only">Skip to main content</a>
 
-  <!-- Video Stream Container -->
-  <div id="videoContainer">
-    <video id="video" autoplay></video>
+  <div class="container" role="main" id="main">
+    <h1 tabindex="0">Accessible Face Recognition Login</h1>
+
+    <div role="status" aria-live="polite" id="statusAnnouncement" class="sr-only"></div>
+    <div role="alert" id="errorAnnouncement" class="sr-only"></div>
+
+    <div class="form-group" tabindex="0" aria-label="Login Instructions">
+      <h2>Instructions:</h2>
+      <ul>
+        <li>Enter your username in the field below</li>
+        <li>You can login using either face recognition or password</li>
+        <li>For face recognition, say "CAPTURE" or press the Space key when ready</li>
+        <li>Make sure your face is clearly visible to the camera</li>
+      </ul>
+    </div>
+
+    <div id="videoContainer" role="region" aria-label="Face Recognition Camera">
+      <video id="video" autoplay aria-label="Face recognition camera feed" tabindex="-1"></video>
+      <button id="cameraToggle" aria-label="Toggle camera" class="focus-visible">
+        Toggle Camera
+      </button>
+    </div>
+
+    <form id="loginForm" role="form" aria-label="Login Form">
+      <div class="form-group">
+        <label for="user_name">Username:</label>
+        <input 
+          type="text" 
+          id="user_name" 
+          name="user_name"
+          aria-label="Enter username"
+          aria-required="true"
+          class="focus-visible"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password"
+          aria-label="Enter password"
+          aria-required="true"
+          class="focus-visible"
+        />
+      </div>
+
+      <div class="form-group">
+        <button 
+          type="button" 
+          onclick="startFaceRecognition()"
+          aria-label="Start face recognition"
+          class="focus-visible"
+        >
+          Start Face Recognition
+        </button>
+        <button 
+          type="button" 
+          onclick="verifyUserPassword()"
+          aria-label="Login with password"
+          class="focus-visible"
+        >
+          Login with Password
+        </button>
+      </div>
+    </form>
+
+    <div id="resultMessage" role="status" aria-live="polite"></div>
   </div>
-
-  <!-- Form for user credentials -->
-  <div id="fields">
-    <input type="text" id="user_name" placeholder="Enter Username" />
-    <input type="password" id="password" placeholder="Enter Password" />
-    <button onclick="verifyUserPassword()">Login with Password</button> <!-- Add your login functionality here -->
-  </div>
-
-  <!-- Result Message -->
-  <div id="resultMessage"></div>
 
   <script>
     const video = document.getElementById('video');
+    const statusAnnouncement = document.getElementById('statusAnnouncement');
+    const errorAnnouncement = document.getElementById('errorAnnouncement');
+    let isVideoActive = false;
+    let recognition = null;
 
-    // Load face-api models when the page loads
+    function announce(message, isError = false) {
+      const element = isError ? errorAnnouncement : statusAnnouncement;
+      element.textContent = message;
+      // Also speak the message
+      const utterance = new SpeechSynthesisUtterance(message);
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Load face-api models
     Promise.all([
       faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
       faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
       faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
-    ]).then(startVideo).catch((err) => {
+    ]).then(() => {
+      announce("Face recognition system is ready. You can start by entering your username.");
+    }).catch((err) => {
+      announce("Error loading face recognition system. Please try password login instead.", true);
       console.error("Error loading models:", err);
     });
 
-    // Start webcam video stream immediately
     function startVideo() {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true })
           .then((stream) => {
             video.srcObject = stream;
+            isVideoActive = true;
+            announce("Camera is now active. Position your face in front of the camera and say 'CAPTURE' or press Space when ready.");
           })
           .catch((err) => {
+            announce("Unable to access the camera. Please ensure camera permissions are granted or use password login.", true);
             console.error("Error accessing the webcam:", err);
-            alert("Unable to access the webcam. Please make sure the camera is connected and permissions are granted.");
           });
       } else {
-        alert("Your browser does not support webcam access.");
+        announce("Your browser does not support camera access. Please use password login instead.", true);
       }
-
-      // After video is playing, we start speech recognition
-      video.addEventListener('play', setupSpeechRecognition);
     }
 
-    // Function to handle voice commands
     function setupSpeechRecognition() {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert("Speech recognition is not supported in this browser.");
+        announce("Voice commands are not supported in this browser. Please use keyboard controls instead.", true);
         return;
       }
 
-      const recognition = new SpeechRecognition();
+      recognition = new SpeechRecognition();
       recognition.lang = 'en-US';
+      recognition.continuous = true;
       recognition.interimResults = false;
 
       recognition.addEventListener('result', async (event) => {
         const command = event.results[0][0].transcript.trim().toUpperCase();
         if (command === "CAPTURE") {
-          console.log("CAPTURE command received. Starting face recognition...");
-          await captureEmbedding();  // Start face recognition when "CAPTURE" is said
+          announce("Capture command received. Starting face recognition...");
+          await captureEmbedding();
         }
       });
 
-      recognition.addEventListener('end', () => recognition.start()); // Keep recognition active
+      recognition.addEventListener('end', () => recognition.start());
       recognition.start();
+      announce("Voice commands are now active. Say 'CAPTURE' when ready.");
     }
 
-    // Capture face embedding function
-    async function captureEmbedding() {
-      const detections = await faceapi
-        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-        .withFaceLandmarks()
-        .withFaceDescriptors();
-
-      if (detections.length > 0) {
-        const embedding = Array.from(detections[0].descriptor); // Take first detected face
-        console.log("Embedding captured:", embedding);
-        
-        // Send captured embedding to the backend for verification
-        await verifyUser(embedding);
-
-        document.getElementById('resultMessage').innerText = "Face captured successfully!";
-      } else {
-        console.log("No face detected. Please try again.");
-        document.getElementById('resultMessage').innerText = "No face detected. Please try again.";
+    async function startFaceRecognition() {
+      if (!isVideoActive) {
+        startVideo();
+        setupSpeechRecognition();
       }
     }
 
-    // Function to verify user using backend
+    async function captureEmbedding() {
+      announce("Processing face recognition...");
+      
+      try {
+        const detections = await faceapi
+          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+          .withFaceLandmarks()
+          .withFaceDescriptors();
+
+        if (detections.length > 0) {
+          const embedding = Array.from(detections[0].descriptor);
+          await verifyUser(embedding);
+        } else {
+          announce("No face detected. Please ensure your face is clearly visible and try again.", true);
+        }
+      } catch (error) {
+        announce("Error during face recognition. Please try again or use password login.", true);
+        console.error("Face recognition error:", error);
+      }
+    }
+
     async function verifyUser(embedding) {
       const userName = document.getElementById('user_name').value.trim();
-      // const password = document.getElementById('password').value.trim();
 
-      if (!userName ) {
-        alert("Please enter both username and password.");
+      if (!userName) {
+        announce("Please enter your username before attempting face recognition.", true);
         return;
       }
-
-      const payload = {
-        user_name: userName,
-        // password: password,
-        embedding: embedding,
-      };
 
       try {
         const response = await fetch('http://127.0.0.1:5000/verify_face', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_name: userName,
+            embedding: embedding,
+          }),
         });
 
         const data = await response.json();
         if (data.success) {
-          console.log(data.message);
-          document.getElementById('resultMessage').innerText = `Login successful for user: ${data.user_name}`;
-          // Only store the user ID if it has not been stored before
-          localStorage.removeItem('user_id');
-          localStorage.removeItem('user_name');
-            localStorage.setItem('user_id', data._id);
-            localStorage.setItem('user_name', data.user_name);
+          announce(`Login successful. Welcome ${data.user_name}`);
+          localStorage.setItem('user_id', data._id);
+          localStorage.setItem('user_name', data.user_name);
           window.location.href = "http://127.0.0.1:5000/home";
         } else {
-          console.log(data.message);
-          document.getElementById('resultMessage').innerText = `Error: ${data.message}`;
+          announce(`Login failed: ${data.message}`, true);
         }
       } catch (error) {
+        announce("Error during verification. Please try again or use password login.", true);
         console.error('Error during verification:', error);
-        document.getElementById('resultMessage').innerText = `Error during verification.`;
       }
     }
 
@@ -229,62 +270,55 @@
       const password = document.getElementById('password').value.trim();
 
       if (!userName || !password) {
-        alert("Please enter both username and password.");
+        announce("Please enter both username and password.", true);
         return;
       }
-
-      const payload = {
-        user_name: userName,
-        password: password,
-      };
 
       try {
         const response = await fetch('http://127.0.0.1:5000/verify_password', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_name: userName, password: password }),
         });
 
         const data = await response.json();
-        console.log(data)
         if (data.success) {
-          console.log(data.message);
-          document.getElementById('resultMessage').innerText = `Login successful for user: ${data.user_name}`;
-          // Only store the user ID if it has not been stored before
-            localStorage.setItem('user_id', data._id);
-            localStorage.setItem('user_name', data.user_name);
+          announce(`Login successful. Welcome ${data.user_name}`);
+          localStorage.setItem('user_id', data._id);
+          localStorage.setItem('user_name', data.user_name);
           window.location.href = "http://127.0.0.1:5000/home";
         } else {
-          console.log(data.message);
-          document.getElementById('resultMessage').innerText = `Error: ${data.message}`;
+          announce(`Login failed: ${data.message}`, true);
         }
       } catch (error) {
+        announce("Error during login. Please try again.", true);
         console.error('Error during verification:', error);
-        document.getElementById('resultMessage').innerText = `Error during verification.`;
       }
     }
 
-    // Display face detection results on the video
-    // video.addEventListener('play', () => {
-    //   const canvas = faceapi.createCanvasFromMedia(video);
-    //   document.body.append(canvas);
-    //   const displaySize = { width: video.width, height: video.height };
-    //   faceapi.matchDimensions(canvas, displaySize);
+    // Keyboard Controls
+    document.addEventListener('keydown', async (event) => {
+      if (event.code === 'Space' && isVideoActive) {
+        event.preventDefault();
+        announce("Capturing face image...");
+        await captureEmbedding();
+      }
+    });
 
-    //   setInterval(async () => {
-    //     const detections = await faceapi
-    //       .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-    //       .withFaceLandmarks();
+    // Focus handling
+    document.addEventListener('keyup', (event) => {
+      if (event.key === 'Tab') {
+        const focused = document.activeElement;
+        if (focused && focused.classList) {
+          focused.classList.add('focus-visible');
+        }
+      }
+    });
 
-        // const resizedDetections = faceapi.resizeResults(detections, displaySize);
-        // canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
-
-        // faceapi.draw.drawDetections(canvas, resizedDetections);
-        // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-      // }, 100);
-    // });
+    // Initial announcement when page loads
+    window.addEventListener('load', () => {
+      announce("Welcome to the accessible face recognition login system. Please enter your username to begin.");
+    });
   </script>
 </body>
 </html>
