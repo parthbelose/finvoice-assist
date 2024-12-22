@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Recognition Signup</title>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+<script defer src="{{ url_for('static', filename='js/signup.js') }}"></script>
+<!-- Link to the external JS file -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #eef2f3;
+    }
+
+    video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 640px;
+      height: 480px;
+      border: 2px solid #333;
+    }
+
+    input {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #resultMessage {
+      font-size: 20px;
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Face Recognition Signup</h1>
+
+  <div>
+    <!-- User credentials input -->
+    <input type="text" id="user_name" placeholder="Enter Username" />
+    <input type="password" id="password" placeholder="Enter Password" />
+  </div>
+
+  <!-- Video Stream from webcam -->
+  <video id="video" width="640" height="480" autoplay></video>
+
+  <!-- Signup button -->
+  <!-- <button id="signupButton">Sign Up</button> -->
+
+  <div id="resultMessage"></div>
+
+</body>
+</html>

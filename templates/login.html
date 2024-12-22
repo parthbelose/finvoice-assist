@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Face Recognition Login</title>
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+  <script defer src="{{ url_for('static', filename='js/login-2.js') }}"></script> <!-- Link to the external JS file -->
+
+  <style>
+    /* body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #f4f4f9;
+      font-family: Arial, sans-serif;
+      overflow: hidden;
+      text-align: center;
+    } */
+    
+    /* h1 {
+      text-align: center;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #4CAF50;
+      z-index: 1;
+    }
+
+    #videoContainer {
+      position: relative;
+      width: 560px;
+      height: 320px;
+      margin-bottom: 30px;
+      z-index: 0;
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      border: 2px solid #333;
+      background-color: black;
+      border-radius: 8px;
+    }
+
+    #fields {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+    }
+
+    input {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resultMessage {
+      font-size: 20px;
+      margin-top: 20px;
+      text-align: center;
+      color: #333;
+    } */
+
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: #f4f4f9;
+      font-family: Arial, sans-serif;
+      height: 100%;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      color: #4CAF50;
+      z-index: 1;
+      padding-top: 20px; 
+    }
+
+    #videoContainer {
+      position: relative;
+      width: 100%;
+      max-width: 640px;
+      height: auto;
+      margin-bottom: 30px;
+      z-index: 0;
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      border: 2px solid #333;
+      background-color: black;
+      border-radius: 8px;
+    }
+
+    #fields {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+    }
+
+    input {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resultMessage {
+      font-size: 20px;
+      margin-top: 20px;
+      text-align: center;
+      color: #333;
+    }
+    
+  </style>
+</head>
+<body>
+
+  <h1>Face Recognition Login</h1>
+
+  <!-- Video Stream Container -->
+  <div id="videoContainer">
+    <video id="video" autoplay muted></video>
+  </div>
+
+  <!-- Form for user credentials -->
+  <div id="fields">
+    <input type="text" id="user_name" placeholder="Enter Username" />
+    <input type="password" id="password" placeholder="Enter Password" />
+    <button onclick="verifyUserPassword()">Login with Password</button> <!-- Add your login functionality here -->
+  </div>
+
+  <!-- Result Message -->
+  <div id="resultMessage"></div>
+
+</body>
+</html>
