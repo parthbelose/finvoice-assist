@@ -111,7 +111,7 @@
     <p id="responseDisplay" class="response"></p>
   </div>
 
-  <script>
+  <!-- <script>
 
     // Check if user is logged in by checking localStorage for user_id
     const userId = localStorage.getItem('user_id');
@@ -222,6 +222,113 @@
       window.location.href = 'http://127.0.0.1:5000/login'; // Redirect to login page
     };
 
+  </script> -->
+  <script>
+    // Key binding setup
+    document.addEventListener('keydown', (event) => {
+      if (event.code === 'Space') {
+        event.preventDefault(); // Prevent default spacebar behavior like scrolling
+        toggleMicrophone();
+      }
+    });
+  
+    // Check if user is logged in by checking localStorage for user_id
+    const userId = localStorage.getItem('user_id');
+    const username = localStorage.getItem('user_name');
+  
+    if (!userId) {
+      // Redirect to login page if no user_id is found
+      window.location.href = '/login'; // Adjust the URL to your login page
+    }
+  
+    const toggleMicrophoneBtn = document.getElementById('toggleMicrophoneBtn');
+    const transcriptDisplay = document.getElementById('transcriptDisplay');
+    const responseDisplay = document.getElementById('responseDisplay');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const userInfo = document.getElementById('userInfo');
+    const userIdElement = document.getElementById('userId');
+    const userNameElement = document.getElementById('userName');
+  
+    let isListening = false;
+    let transcript = '';
+  
+    // Populate user info from local storage
+    userIdElement.textContent = `User ID: ${localStorage.getItem('user_id')}`;
+    userNameElement.textContent = `User Name: ${localStorage.getItem('user_name')}`;
+  
+    // Speech Recognition setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+  
+    recognition.onstart = () => {
+      isListening = true;
+      toggleMicrophoneBtn.textContent = "Stop Microphone";
+      transcriptDisplay.textContent = "Listening...";
+    };
+  
+    recognition.onend = () => {
+      isListening = false;
+      toggleMicrophoneBtn.textContent = "Start Microphone";
+    };
+  
+    recognition.onresult = (event) => {
+      transcript = event.results[0][0].transcript;
+      transcriptDisplay.textContent = `Your Input: ${transcript}`;
+  
+      // Check if the user said "logout"
+      if (transcript.toLowerCase().includes('logout')) {
+        logOut();
+      }
+      generateResponse();
+    };
+  
+    const toggleMicrophone = () => {
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.start();
+      }
+    };
+  
+    toggleMicrophoneBtn.addEventListener('click', toggleMicrophone);
+  
+    // Function to generate a response from the backend
+    const generateResponse = async () => {
+      loadingSpinner.style.display = 'block';
+      try {
+        const res = await fetch('{{ url_for("chat") }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: `My name is ${username} and my user_id is ${userId}. ${transcript}` }),
+        });
+        const data = await res.json();
+        responseDisplay.textContent = `Response: ${data.message}`;
+        speakResponse(data.message);
+      } catch (error) {
+        console.error('Error generating response:', error);
+        responseDisplay.textContent = 'Sorry, there was an error processing your request.';
+        speakResponse('Sorry, there was an error processing your request.');
+      }
+      loadingSpinner.style.display = 'none';
+    };
+  
+    // Function to speak the response
+    const speakResponse = (text) => {
+      const speechSynthesis = window.speechSynthesis;
+      const speech = new SpeechSynthesisUtterance(text);
+      speechSynthesis.speak(speech);
+    };
+  
+    const logOut = () => {
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userName');
+      window.location.href = 'http://127.0.0.1:5000/login'; // Redirect to login page
+    };
   </script>
+  
 </body>
 </html>
