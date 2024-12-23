@@ -17,7 +17,8 @@ from langchain.chains import LLMChain
 from langchain_community.utilities import SerpAPIWrapper
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
-SERP_API="ff667c4cb40ba9e12a67c8e6aace52c4d33ccab55af97549d0f716154438ca29"
+SERP_API="SERP_API_KEY"
+GOOGLE_API_KEY="GOOGLE_API_KEY"
 # Load environment variables (for API key)
 # GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY")
 # if not GOOGLE_API_KEY:
@@ -36,7 +37,7 @@ def get_llm():
         max_tokens=None,
         timeout=None,
         max_retries=2,
-        api_key="AIzaSyBgUML1bdtLTMHPmHJfXNYkNv8HBj_dXg4"
+        api_key=GOOGLE_API_KEY
     )
 llm=get_llm()
 # Load the FAISS index from saved files
