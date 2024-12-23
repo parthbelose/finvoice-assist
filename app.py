@@ -36,7 +36,7 @@ def get_llm():
         max_tokens=None,
         timeout=None,
         max_retries=2,
-        api_key="AIzaSyBsIqWpyad4vloLY8sy7zfd1ppDcZCfkUg"
+        api_key="AIzaSyBgUML1bdtLTMHPmHJfXNYkNv8HBj_dXg4"
     )
 llm=get_llm()
 # Load the FAISS index from saved files
@@ -85,7 +85,7 @@ def check_balance_tool(user_id) -> str:
     Returns the balance of the user or an error if not found.
     """
     try:
-        user_id=str(user_id)
+        user_id=str(user_id).strip()
         user = users_collection.find_one({"_id": ObjectId(user_id)})
         if not user:
             return "Error: User not found."
@@ -332,6 +332,38 @@ def home():
 def signup():
     return render_template('signUp.html')
 
+
+@app.route('/registerUser', methods=['POST'])
+def registerUser():
+    try:
+        # Extract data from the request
+        user_data = request.json
+        
+        # Validate required fields
+        required_fields = ["user_name", "embeddings", "password"]
+        for field in required_fields:
+            if field not in user_data:
+                return jsonify({"error": f"Missing field: {field}"}), 400
+
+        # Check if the user already exists
+        existing_user = users_collection.find_one({"user_name": user_data["username"]})
+        if existing_user:
+            return jsonify({"error": "User with this email already exists."}), 409
+
+        # Insert user into the database
+        new_user = {
+            "username": user_data["username"],
+            "embeddings": user_data["embeddings"],
+            "password": user_data["password"]  # Consider hashing passwords in a real application
+        }
+        users_collection.insert_one(new_user)
+
+        return jsonify({"message": "User registered successfully."}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
 @app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.get_json().get("message")
@@ -425,4 +457,4 @@ def verify_password():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)

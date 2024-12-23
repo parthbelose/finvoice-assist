@@ -136,189 +136,400 @@
   </div>
 
   <script>
-    const video = document.getElementById('video');
-    const statusAnnouncement = document.getElementById('statusAnnouncement');
-    const errorAnnouncement = document.getElementById('errorAnnouncement');
-    let isVideoActive = false;
-    let recognition = null;
+    // const video = document.getElementById('video');
+    // const statusAnnouncement = document.getElementById('statusAnnouncement');
+    // const errorAnnouncement = document.getElementById('errorAnnouncement');
+    // let isVideoActive = false;
+    // let recognition = null;
 
-    function announce(message, isError = false) {
-      const element = isError ? errorAnnouncement : statusAnnouncement;
-      element.textContent = message;
-      // Also speak the message
-      const utterance = new SpeechSynthesisUtterance(message);
-      window.speechSynthesis.speak(utterance);
-    }
+    // function announce(message, isError = false) {
+    //   const element = isError ? errorAnnouncement : statusAnnouncement;
+    //   element.textContent = message;
+    //   // Also speak the message
+    //   const utterance = new SpeechSynthesisUtterance(message);
+    //   window.speechSynthesis.speak(utterance);
+    // }
 
-    // Load face-api models
-    Promise.all([
-      faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
-      faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
-      faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
-    ]).then(() => {
-      announce("Face recognition system is ready. You can start by entering your username.");
-    }).catch((err) => {
-      announce("Error loading face recognition system. Please try password login instead.", true);
-      console.error("Error loading models:", err);
-    });
+    // // Load face-api models
+    // Promise.all([
+    //   faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
+    //   faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
+    //   faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
+    // ]).then(() => {
+    //   announce("Face recognition system is ready. You can start by entering your username.");
+    // }).catch((err) => {
+    //   announce("Error loading face recognition system. Please try password login instead.", true);
+    //   console.error("Error loading models:", err);
+    // });
 
-    function startVideo() {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true })
-          .then((stream) => {
-            video.srcObject = stream;
-            isVideoActive = true;
-            announce("Camera is now active. Position your face in front of the camera and say 'CAPTURE' or press Space when ready.");
-          })
-          .catch((err) => {
-            announce("Unable to access the camera. Please ensure camera permissions are granted or use password login.", true);
-            console.error("Error accessing the webcam:", err);
-          });
-      } else {
-        announce("Your browser does not support camera access. Please use password login instead.", true);
-      }
-    }
+    // function startVideo() {
+    //   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    //     navigator.mediaDevices.getUserMedia({ video: true })
+    //       .then((stream) => {
+    //         video.srcObject = stream;
+    //         isVideoActive = true;
+    //         announce("Camera is now active. Position your face in front of the camera and say 'CAPTURE' or press Space when ready.");
+    //       })
+    //       .catch((err) => {
+    //         announce("Unable to access the camera. Please ensure camera permissions are granted or use password login.", true);
+    //         console.error("Error accessing the webcam:", err);
+    //       });
+    //   } else {
+    //     announce("Your browser does not support camera access. Please use password login instead.", true);
+    //   }
+    // }
 
-    function setupSpeechRecognition() {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        announce("Voice commands are not supported in this browser. Please use keyboard controls instead.", true);
-        return;
-      }
+    // function setupSpeechRecognition() {
+    //   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    //   if (!SpeechRecognition) {
+    //     announce("Voice commands are not supported in this browser. Please use keyboard controls instead.", true);
+    //     return;
+    //   }
 
-      recognition = new SpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.continuous = true;
-      recognition.interimResults = false;
+    //   recognition = new SpeechRecognition();
+    //   recognition.lang = 'en-US';
+    //   recognition.continuous = true;
+    //   recognition.interimResults = false;
 
-      recognition.addEventListener('result', async (event) => {
-        const command = event.results[0][0].transcript.trim().toUpperCase();
-        if (command === "CAPTURE") {
-          announce("Capture command received. Starting face recognition...");
-          await captureEmbedding();
-        }
-      });
+    //   recognition.addEventListener('result', async (event) => {
+    //     const command = event.results[0][0].transcript.trim().toUpperCase();
+    //     console.log(command)
+    //     if (command === "CAPTURE") {
+    //       announce("Capture command received. Starting face recognition...");
+    //       await captureEmbedding();
+    //     }
+    //   });
 
-      recognition.addEventListener('end', () => recognition.start());
-      recognition.start();
-      announce("Voice commands are now active. Say 'CAPTURE' when ready.");
-    }
+    //   recognition.addEventListener('end', () => recognition.start());
+    //   recognition.start();
+    //   announce("Voice commands are now active. Say 'CAPTURE' when ready.");
+    // }
 
-    async function startFaceRecognition() {
-      if (!isVideoActive) {
-        startVideo();
-        setupSpeechRecognition();
-      }
-    }
+    // async function startFaceRecognition() {
+    //   if (!isVideoActive) {
+    //     startVideo();
+    //     setupSpeechRecognition();
+    //   }
+    // }
 
-    async function captureEmbedding() {
-      announce("Processing face recognition...");
+    // async function captureEmbedding() {
+    //   announce("Processing face recognition...");
       
-      try {
-        const detections = await faceapi
-          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-          .withFaceLandmarks()
-          .withFaceDescriptors();
+    //   try {
+    //     const detections = await faceapi
+    //       .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+    //       .withFaceLandmarks()
+    //       .withFaceDescriptors();
 
-        if (detections.length > 0) {
-          const embedding = Array.from(detections[0].descriptor);
-          await verifyUser(embedding);
-        } else {
-          announce("No face detected. Please ensure your face is clearly visible and try again.", true);
-        }
-      } catch (error) {
-        announce("Error during face recognition. Please try again or use password login.", true);
-        console.error("Face recognition error:", error);
-      }
+    //     if (detections.length > 0) {
+    //       const embedding = Array.from(detections[0].descriptor);
+    //       await verifyUser(embedding);
+    //     } else {
+    //       announce("No face detected. Please ensure your face is clearly visible and try again.", true);
+    //       setupSpeechRecognition();
+    //     }
+    //   } catch (error) {
+    //     announce("Error during face recognition. Please try again or use password login.", true);
+    //     setupSpeechRecognition();
+    //     console.error("Face recognition error:", error);
+    //   }
+    // }
+
+    // async function verifyUser(embedding) {
+    //   const userName = document.getElementById('user_name').value.trim();
+
+    //   if (!userName) {
+    //     announce("Please enter your username before attempting face recognition.", true);
+    //     return;
+    //   }
+
+    //   try {
+    //     const response = await fetch('http://127.0.0.1:5000/verify_face', {
+    //       method: 'POST',
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify({
+    //         user_name: userName,
+    //         embedding: embedding,
+    //       }),
+    //     });
+
+    //     const data = await response.json();
+    //     if (data.success) {
+    //       announce(`Login successful. Welcome ${data.user_name}`);
+    //       localStorage.setItem('user_id', data._id);
+    //       localStorage.setItem('user_name', data.user_name);
+    //       window.location.href = "http://127.0.0.1:5000/home";
+    //     } else {
+    //       announce(`Login failed: ${data.message}`, true);
+    //     }
+    //   } catch (error) {
+    //     announce("Error during verification. Please try again or use password login.", true);
+    //     console.error('Error during verification:', error);
+    //   }
+    // }
+
+    // async function verifyUserPassword() {
+    //   const userName = document.getElementById('user_name').value.trim();
+    //   const password = document.getElementById('password').value.trim();
+
+    //   if (!userName || !password) {
+    //     announce("Please enter both username and password.", true);
+    //     return;
+    //   }
+
+    //   try {
+    //     const response = await fetch('http://127.0.0.1:5000/verify_password', {
+    //       method: 'POST',
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify({ user_name: userName, password: password }),
+    //     });
+
+    //     const data = await response.json();
+    //     if (data.success) {
+    //       announce(`Login successful. Welcome ${data.user_name}`);
+    //       localStorage.setItem('user_id', data._id);
+    //       localStorage.setItem('user_name', data.user_name);
+    //       window.location.href = "http://127.0.0.1:5000/home";
+    //     } else {
+    //       announce(`Login failed: ${data.message}`, true);
+    //     }
+    //   } catch (error) {
+    //     announce("Error during login. Please try again.", true);
+    //     console.error('Error during verification:', error);
+    //   }
+    // }
+
+    // // Keyboard Controls
+    // document.addEventListener('keydown', async (event) => {
+    //   if (event.code === 'Space' && isVideoActive) {
+    //     event.preventDefault();
+    //     announce("Capturing face image...");
+    //     await captureEmbedding();
+    //   }
+    // });
+
+    // // Focus handling
+    // document.addEventListener('keyup', (event) => {
+    //   if (event.key === 'Tab') {
+    //     const focused = document.activeElement;
+    //     if (focused && focused.classList) {
+    //       focused.classList.add('focus-visible');
+    //     }
+    //   }
+    // });
+
+    // // Initial announcement when page loads
+    // window.addEventListener('load', () => {
+    //   announce("Welcome to the accessible face recognition login system. Please enter your username to begin.");
+    // });
+    const video = document.getElementById('video');
+let recognition = null;
+let isListeningForUsername = false;
+
+// Load face-api models when the page loads
+Promise.all([
+  faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
+  faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
+  faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
+]).then(startVideo).catch((err) => {
+  console.error("Error loading models:", err);
+});
+
+// Start webcam video stream immediately
+function startVideo() 
+{
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+      })
+      .catch((err) => {
+        console.error("Error accessing the webcam:", err);
+        alert("Unable to access the webcam. Please make sure the camera is connected and permissions are granted.");
+      });
+  } else {
+    alert("Your browser does not support webcam access.");
+  }
+
+  // After video is playing, we start speech recognition
+  video.addEventListener('play', () => {
+    speakInstructions();
+    setupSpeechRecognition();
+  });
+}
+
+function speakInstructions() {
+  const speech = new SpeechSynthesisUtterance(
+    "Welcome to face recognition login. Please say your username after the beep. " +
+    "After username confirmation, say 'CAPTURE' when ready for face verification."
+  );
+  speech.onend = () => {
+    // Play a beep sound
+    const beep = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiKNwgZaLvt559NEAxQp+PwtmMcBzhyuOjdszMGKHq48timOQcbVqjZ5bdqGwg6ds7u1YYpBSF1w+vQiSwFFmu33O2mQwoRU6bY6bh9JgYkc7ff56FAChZnvuPpoT4HFFCj4OvEeikFHmG23+yrRgsRSZnd6bt+JQUja7vj66lGCxFCltjpxoIpBRxes+Htq0oMDkKV1+zMiiwFGlyt4uvDXxkIOI7S6top/wQtjs7k6DBHCBNR0rmYmZnMzMzMzMzMzMzMzMzMzMzMzKyZUTUFLZPY8cNsPwUYXLjm78FtIAYpfM7m9IU3BhE+nN/42aB5RQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+    beep.play();
+    beep.onended = startListeningForUsername;
+  };
+  window.speechSynthesis.speak(speech);
+}
+
+function startListeningForUsername() {
+  isListeningForUsername = true;
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Speech recognition is not supported in this browser.");
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+  recognition.lang = 'en-US';
+  recognition.continuous = true;
+  recognition.interimResults = false;
+
+  recognition.addEventListener('result', handleSpeechResult);
+  recognition.addEventListener('end', () => {
+    // Restart recognition if we're still listening for username or commands
+    if (isListeningForUsername || !document.getElementById('user_name').value) {
+      recognition.start();
     }
+  });
 
-    async function verifyUser(embedding) {
-      const userName = document.getElementById('user_name').value.trim();
+  recognition.start();
+}
 
-      if (!userName) {
-        announce("Please enter your username before attempting face recognition.", true);
-        return;
-      }
+function handleSpeechResult(event) {
+  const transcript = event.results[event.results.length - 1][0].transcript.trim();
+  
+  if (isListeningForUsername) {
+    // Handle username capture
+    document.getElementById('user_name').value = transcript.toLowerCase();
+    isListeningForUsername = false;
+    
+    // Confirm username and provide next instructions
+    const confirmationSpeech = new SpeechSynthesisUtterance(
+      `Username set to ${transcript}. Please say 'CAPTURE' when ready for face verification.`
+    );
+    window.speechSynthesis.speak(confirmationSpeech);
+  } else if (transcript.toUpperCase() === 'CAPTURE') {
+    // Handle capture command
+    captureEmbedding();
+  }
+}
 
-      try {
-        const response = await fetch('http://127.0.0.1:5000/verify_face', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            user_name: userName,
-            embedding: embedding,
-          }),
-        });
+// Function to handle voice commands
+// function setupSpeechRecognition() {
+//   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+//   if (!SpeechRecognition) {
+//     alert("Speech recognition is not supported in this browser.");
+//     return;
+//   }
 
-        const data = await response.json();
-        if (data.success) {
-          announce(`Login successful. Welcome ${data.user_name}`);
-          localStorage.setItem('user_id', data._id);
-          localStorage.setItem('user_name', data.user_name);
-          window.location.href = "http://127.0.0.1:5000/home";
-        } else {
-          announce(`Login failed: ${data.message}`, true);
-        }
-      } catch (error) {
-        announce("Error during verification. Please try again or use password login.", true);
-        console.error('Error during verification:', error);
-      }
-    }
+//   const recognition = new SpeechRecognition();
+//   recognition.lang = 'en-US';
+//   recognition.interimResults = false;
 
-    async function verifyUserPassword() {
-      const userName = document.getElementById('user_name').value.trim();
-      const password = document.getElementById('password').value.trim();
+//   recognition.addEventListener('result', async (event) => {
+//     const command = event.results[0][0].transcript.trim().toUpperCase();
+//     if (command === "CAPTURE") {
+//       console.log("CAPTURE command received. Starting face recognition...");
+//       await captureEmbedding();  // Start face recognition when "CAPTURE" is said
+//     }
+//   });
 
-      if (!userName || !password) {
-        announce("Please enter both username and password.", true);
-        return;
-      }
+//   recognition.addEventListener('end', () => recognition.start()); // Keep recognition active
+//   recognition.start();
+// }
 
-      try {
-        const response = await fetch('http://127.0.0.1:5000/verify_password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_name: userName, password: password }),
-        });
+// Capture face embedding function
+// Capture face embedding function
+async function captureEmbedding() {
+  const detections = await faceapi
+    .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+    .withFaceLandmarks()
+    .withFaceDescriptors();
 
-        const data = await response.json();
-        if (data.success) {
-          announce(`Login successful. Welcome ${data.user_name}`);
-          localStorage.setItem('user_id', data._id);
-          localStorage.setItem('user_name', data.user_name);
-          window.location.href = "http://127.0.0.1:5000/home";
-        } else {
-          announce(`Login failed: ${data.message}`, true);
-        }
-      } catch (error) {
-        announce("Error during login. Please try again.", true);
-        console.error('Error during verification:', error);
-      }
-    }
+  if (detections.length > 0) {
+    const embedding = Array.from(detections[0].descriptor); // Take first detected face
+    console.log("Embedding captured:", embedding);
+    
+    // Send captured embedding to the backend for verification
+    await verifyUser(embedding);
 
-    // Keyboard Controls
-    document.addEventListener('keydown', async (event) => {
-      if (event.code === 'Space' && isVideoActive) {
-        event.preventDefault();
-        announce("Capturing face image...");
-        await captureEmbedding();
-      }
+    document.getElementById('resultMessage').innerText = "Face captured successfully!";
+  } else {
+    const speech = new SpeechSynthesisUtterance("No face detected. Please try again by saying 'CAPTURE'.");
+    window.speechSynthesis.speak(speech);
+    document.getElementById('resultMessage').innerText = "No face detected. Please try again.";
+  }
+}
+
+// Function to verify user using backend
+async function verifyUser(embedding) {
+  const userName = document.getElementById('user_name').value.trim();
+
+  if (!userName) {
+    const speech = new SpeechSynthesisUtterance("Please provide your username first.");
+    window.speechSynthesis.speak(speech);
+    isListeningForUsername = true;
+    // alert("Please enter both username and password.");
+    return;
+  }
+
+  const payload = {
+    user_name: userName,
+    // password: password,
+    embedding: embedding,
+  };
+
+  try {
+    const response = await fetch('http://127.0.0.1:5000/verify_face', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
     });
 
-    // Focus handling
-    document.addEventListener('keyup', (event) => {
-      if (event.key === 'Tab') {
-        const focused = document.activeElement;
-        if (focused && focused.classList) {
-          focused.classList.add('focus-visible');
-        }
-      }
-    });
+    const data = await response.json();
+    if (data.success) {
+      const speech = new SpeechSynthesisUtterance(`Login successful. Welcome ${data.user_name}`);
+      window.speechSynthesis.speak(speech);
+      // console.log(data);
+      document.getElementById('resultMessage').innerText = `Login successful for user: ${data.user_name}`;
+      const userId = localStorage.setItem('user_id',data._id);
+      window.location.href="http://127.0.0.1:5000/home"
+    } else {
+      const speech = new SpeechSynthesisUtterance(`Verification failed: ${data.message}`);
+      window.speechSynthesis.speak(speech);
+      document.getElementById('resultMessage').innerText = `Error: ${data.message}`;
+    }
+  } catch (error) {
+    const speech = new SpeechSynthesisUtterance("Error during verification. Please try again.");
+    window.speechSynthesis.speak(speech);
+    document.getElementById('resultMessage').innerText = `Error during verification.`;
+  }
+}
 
-    // Initial announcement when page loads
-    window.addEventListener('load', () => {
-      announce("Welcome to the accessible face recognition login system. Please enter your username to begin.");
-    });
+// Display face detection results on the video
+video.addEventListener('play', () => {
+  const canvas = faceapi.createCanvasFromMedia(video);
+  document.body.append(canvas);
+  const displaySize = { width: video.width, height: video.height };
+  faceapi.matchDimensions(canvas, displaySize);
+
+  setInterval(async () => {
+    const detections = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks();
+
+    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+    faceapi.draw.drawDetections(canvas, resizedDetections);
+    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+  }, 100);
+});
+
+
   </script>
 </body>
 </html>
