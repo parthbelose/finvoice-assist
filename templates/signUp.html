@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Face Recognition Signup</title>
   <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
-<script defer src="{{ url_for('static', filename='js/signUp.js') }}"></script>
-<!-- Link to the external JS file -->
   <style>
     body {
       margin: 0;
@@ -17,64 +15,271 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      background-color: #eef2f3;
+      background-color: #f4f4f9;
     }
-
+    
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-family: Arial, sans-serif;
+    }
+    
+    #videoContainer {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
     video {
-      position: absolute;
-      top: 0;
-      left: 0;
       width: 640px;
       height: 480px;
       border: 2px solid #333;
+      border-radius: 8px;
+      background-color: #000;
+    }
+
+    #fields {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 20px 0;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     input {
       margin: 10px;
-      padding: 10px;
+      padding: 12px;
       font-size: 16px;
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
       border-radius: 4px;
+      width: 300px;
+      transition: border-color 0.3s ease;
     }
 
-    button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
+    input:focus {
+      outline: none;
+      border-color: #4CAF50;
     }
 
     #resultMessage {
-      font-size: 20px;
+      font-size: 18px;
       margin-top: 20px;
       text-align: center;
+      color: #333;
+      padding: 10px;
+      border-radius: 4px;
+      max-width: 400px;
+    }
+
+    .success {
+      background-color: #dff0d8;
+      color: #3c763d;
+    }
+
+    .error {
+      background-color: #f2dede;
+      color: #a94442;
+    }
+
+    .instructions {
+      text-align: center;
+      color: #666;
+      margin: 10px 0;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-
   <h1>Face Recognition Signup</h1>
-
-  <div>
-    <!-- User credentials input -->
-    <input type="text" id="user_name" placeholder="Enter Username" />
-    <input type="password" id="password" placeholder="Enter Password" />
+  
+  <!-- Video Stream Container -->
+  <div id="videoContainer">
+    <video id="video" autoplay></video>
   </div>
 
-  <!-- Video Stream from webcam -->
-  <video id="video" width="640" height="480" autoplay></video>
+  <!-- Form Fields -->
+  <div id="fields">
+    <input type="text" id="user_name" placeholder="Enter Username" readonly />
+    <input type="password" id="password" placeholder="Enter Password" />
+    <p class="instructions">Please say your username when prompted, then say "CAPTURE" to register your face.</p>
+  </div>
 
-  <!-- Signup button -->
-  <!-- <button id="signupButton">Sign Up</button> -->
-
+  <!-- Result Message -->
   <div id="resultMessage"></div>
 
+  <script>
+    const video = document.getElementById('video');
+    let recognition = null;
+    let isListeningForUsername = false;
+
+    // Load face-api models
+    Promise.all([
+      faceapi.nets.tinyFaceDetector.loadFromUri('/static/models'),
+      faceapi.nets.faceLandmark68Net.loadFromUri('/static/models'),
+      faceapi.nets.faceRecognitionNet.loadFromUri('/static/models')
+    ]).then(startVideo).catch((err) => {
+      console.error("Error loading models:", err);
+    });
+
+    function startVideo() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true })
+          .then((stream) => {
+            video.srcObject = stream;
+          })
+          .catch((err) => {
+            console.error("Error accessing the webcam:", err);
+            showMessage("Unable to access the webcam. Please make sure the camera is connected and permissions are granted.", "error");
+          });
+      } else {
+        showMessage("Your browser does not support webcam access.", "error");
+      }
+
+      video.addEventListener('play', () => {
+        speakInstructions();
+        setupSpeechRecognition();
+        setupFaceDetection();
+      });
+    }
+
+    function speakInstructions() {
+      const speech = new SpeechSynthesisUtterance(
+        "Welcome to face recognition signup. Please say your username after the beep. " +
+        "After username confirmation, enter your password and say 'CAPTURE' to register your face."
+      );
+      speech.onend = () => {
+        const beep = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiKNwgZaLvt559NEAxQp+PwtmMcBzhyuOjdszMGKHq48timOQcbVqjZ5bdqGwg6ds7u1YYpBSF1w+vQiSwFFmu33O2mQwoRU6bY6bh9JgYkc7ff56FAChZnvuPpoT4HFFCj4OvEeikFHmG23+yrRgsRSZnd6bt+JQUja7vj66lGCxFCltjpxoIpBRxes+Htq0oMDkKV1+zMiiwFGlyt4uvDXxkIOI7S6top/wQtjs7k6DBHCBNR0rmYmZnMzMzMzMzMzMzMzMzMzMzMzKyZUTUFLZPY8cNsPwUYXLjm78FtIAYpfM7m9IU3BhE+nN/42aB5RQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+        beep.play();
+        beep.onended = startListeningForUsername;
+      };
+      window.speechSynthesis.speak(speech);
+    }
+
+    function startListeningForUsername() {
+      isListeningForUsername = true;
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showMessage("Speech recognition is not supported in this browser.", "error");
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.continuous = true;
+      recognition.interimResults = false;
+
+      recognition.addEventListener('result', handleSpeechResult);
+      recognition.addEventListener('end', () => {
+        if (isListeningForUsername || !document.getElementById('user_name').value) {
+          recognition.start();
+        }
+      });
+
+      recognition.start();
+    }
+
+    function handleSpeechResult(event) {
+      const transcript = event.results[event.results.length - 1][0].transcript.trim();
+      
+      if (isListeningForUsername) {
+        document.getElementById('user_name').value = transcript.toLowerCase();
+        isListeningForUsername = false;
+        
+        const confirmationSpeech = new SpeechSynthesisUtterance(
+          `Username set to ${transcript}. Please enter your password and say 'CAPTURE' when ready to register your face.`
+        );
+        window.speechSynthesis.speak(confirmationSpeech);
+      } else if (transcript.toUpperCase() === 'CAPTURE') {
+        captureEmbedding();
+      }
+    }
+
+    function showMessage(message, type) {
+      const resultMessage = document.getElementById('resultMessage');
+      resultMessage.textContent = message;
+      resultMessage.className = type;
+    }
+
+    async function captureEmbedding() {
+      const password = document.getElementById('password').value.trim();
+      if (!password) {
+        showMessage("Please enter a password before capturing your face.", "error");
+        return;
+      }
+
+      const detections = await faceapi
+        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceDescriptors();
+
+      if (detections.length > 0) {
+        const embedding = Array.from(detections[0].descriptor);
+        await registerUser(embedding);
+      } else {
+        showMessage("No face detected. Please ensure your face is visible and try again.", "error");
+        const speech = new SpeechSynthesisUtterance("No face detected. Please try again by saying 'CAPTURE'.");
+        window.speechSynthesis.speak(speech);
+      }
+    }
+
+    async function registerUser(embedding) {
+      const userName = document.getElementById('user_name').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      try {
+        const response = await fetch('http://127.0.0.1:5000/registerUser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_name: userName,
+            password: password,
+            embedding: embedding
+          })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          showMessage("Registration successful! Redirecting to home page...", "success");
+          const speech = new SpeechSynthesisUtterance("Registration successful! Redirecting to home page.");
+          window.speechSynthesis.speak(speech);
+          
+          localStorage.setItem('user_id', data.user_id);
+          localStorage.setItem('user_name', userName);
+          
+          setTimeout(() => {
+            window.location.href = "http://127.0.0.1:5000/home";
+          }, 2000);
+        } else {
+          showMessage(data.message || "Error during signup. Please try again.", "error");
+          const speech = new SpeechSynthesisUtterance(data.message || "Error during signup. Please try again.");
+          window.speechSynthesis.speak(speech);
+        }
+      } catch (error) {
+        showMessage("Error during signup. Please try again.", "error");
+        const speech = new SpeechSynthesisUtterance("Error during signup. Please try again.");
+        window.speechSynthesis.speak(speech);
+      }
+    }
+
+    function setupFaceDetection() {
+      const canvas = faceapi.createCanvasFromMedia(video);
+      document.getElementById('videoContainer').appendChild(canvas);
+      const displaySize = { width: video.width, height: video.height };
+      faceapi.matchDimensions(canvas, displaySize);
+
+      setInterval(async () => {
+        const detections = await faceapi
+          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+          .withFaceLandmarks();
+
+        const resizedDetections = faceapi.resizeResults(detections, displaySize);
+        canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+        faceapi.draw.drawDetections(canvas, resizedDetections);
+        faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      }, 100);
+    }
+  </script>
 </body>
 </html>
